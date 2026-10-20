@@ -1,0 +1,17 @@
+<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>OFFLINE CONTROL</title>
+<style>body{font-family:sans-serif;background:#111;color:#fff;padding:15px}.card{background:#222;padding:15px;border-radius:10px;margin:10px 0}button{width:100%;padding:15px;margin:5px 0;border:0;border-radius:8px;font-weight:bold}</style>
+</head><body><h2>🛡️ OFFLINE COMPANY</h2>
+<div class="card"><h3>📊 الأجهزة</h3><button style="background:#1877F2;color:#fff" onclick="load()">تحديث</button><div id="devices">جاري التحميل...</div></div>
+<div class="card"><button style="background:red;color:#fff" onclick="admin('kill_all')">⛔ طفي عند كولشي</button><button style="background:green;color:#fff" onclick="admin('unkill')">✅ رجع الكل</button></div>
+<script>
+const SECRET="OFFLINE2026";
+async function load(){ let r=await fetch("/dashboard-data"); let db=await r.json(); let h=`أجهزة: ${Object.keys(db.devices).length}<br><br>`;
+for(let id in db.devices){ let d=db.devices[id]; h+=`<div style="background:#333;padding:10px;margin:5px 0;border-radius:8px">📱 ${id}<br>حالة: ${d.status} ${d.blocked?'⛔مبلوكي':''}<br>${new Date(d.lastSeen).toLocaleString()}<br>
+<button onclick="act('activate','${id}')" style="background:green;color:white">أكتيفي</button>
+<button onclick="act('block','${id}')" style="background:red;color:white">بلوكي</button>
+<button onclick="act('unblock','${id}')" style="background:gray;color:white">فك</button></div>`; }
+document.getElementById("devices").innerHTML=h; }
+async function act(a,id){ await fetch("/admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:SECRET,action:a,deviceId:id})}); load(); }
+async function admin(a){ await fetch("/admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret:SECRET,action:a})}); load(); }
+load(); setInterval(load,3000);
+</script></body></html>
